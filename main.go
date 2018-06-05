@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -26,7 +27,7 @@ more of its dependacies have been modified`)
 }
 
 var (
-	packages      []string                  // the packages to check for taint
+	packages      map[string]struct{}       // the packages to check for taint
 	changedDirs   map[string]struct{}       // the directories which contain modified files
 	cache         map[string]*build.Package // a map[>package name>]<build.Package> to skip repeat lookups
 	gitDirPtr     *string                   // the git directory to check for changes
@@ -37,6 +38,7 @@ var (
 func init() {
 	cache = make(map[string]*build.Package)
 	changedDirs = make(map[string]struct{})
+	packages = make(map[string]struct{})
 }
 
 func main() {
@@ -70,16 +72,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, v := range packages {
+	output := make(map[string]struct{})
+	for k := range packages {
 		// get all the deps
-		deps, err := findDeps(v, cwd)
+		deps, err := findDeps(k, cwd)
 		if err != nil {
 			log.Fatal(err)
 		}
 		if hasChanges(deps) {
-			fmt.Println(v)
+			output[k] = struct{}{}
 		}
 	}
+	// finally to make it all pretty, sort it in a slice
+	prettyOutput := make([]string, 0, len(output))
+	for k := range output {
+		prettyOutput = append(prettyOutput, k)
+	}
+	if len(prettyOutput) == 0 {
+		return
+	}
+	sort.Strings(prettyOutput)
+	fmt.Println(strings.Join(prettyOutput, "\n"))
 }
 
 // checks to see if any of the deps have the same suffix as anything in the changedDirs
@@ -98,7 +111,7 @@ func hasChanges(deps []string) bool {
 func readPackages() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		packages = append(packages, scanner.Text())
+		packages[scanner.Text()] = struct{}{}
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)

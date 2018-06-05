@@ -6,7 +6,7 @@ import (
 )
 
 type context struct {
-	soFar map[string]bool
+	soFar map[string]struct{}
 	ctx   build.Context
 }
 
@@ -28,11 +28,11 @@ func (c *context) find(name, dir string) (err error) {
 	}
 
 	if name != "." {
-		c.soFar[pkg.ImportPath] = true
+		c.soFar[pkg.ImportPath] = struct{}{}
 	}
 	imports := pkg.Imports
 	for _, imp := range imports {
-		if !c.soFar[imp] {
+		if _, ok := c.soFar[imp]; !ok {
 			if err := c.find(imp, pkg.Dir); err != nil {
 				return err
 			}
@@ -45,7 +45,7 @@ func findDeps(name, dir string) ([]string, error) {
 	ctx := build.Default
 
 	c := &context{
-		soFar: make(map[string]bool),
+		soFar: make(map[string]struct{}),
 		ctx:   ctx,
 	}
 	if err := c.find(name, dir); err != nil {
@@ -53,9 +53,7 @@ func findDeps(name, dir string) ([]string, error) {
 	}
 	deps := make([]string, 0, len(c.soFar))
 	for p := range c.soFar {
-		if p != name {
-			deps = append(deps, p)
-		}
+		deps = append(deps, p)
 	}
 	sort.Strings(deps)
 	return deps, nil
