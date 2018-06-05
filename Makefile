@@ -16,4 +16,6 @@ test:
 .PHONY: test
 
 package:
-	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux.amd64.tainted -ldflags="-s -w" .
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux.amd64.tainted -ldflags="-s -w" . && \
+	tar czf linux.amd64.tainted.tar.gz linux.amd64.tainted && \
+	rm linux.amd64.tainted
