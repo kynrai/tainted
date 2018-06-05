@@ -1,5 +1,5 @@
-BINARIES=$$(go list ./cmd/...)
-TESTABLE=$$(go list ./... | grep -v /vendor/)
+BINARIES=$$(go list ./...)
+TESTABLE=$$(go list ./...)
 
 all : test build
 
@@ -16,4 +16,4 @@ test:
 .PHONY: test
 
 package:
-	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux.amd64.chooser -ldflags="-s -w" ./cmd/chooser
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o linux.amd64.tainted -ldflags="-s -w" .
