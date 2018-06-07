@@ -24,6 +24,10 @@ From the go project repo e.g. `$GOPATH/src/github.com/user/repo/`
 
     go list ./... | tainted
 
+It using the standard go repo layout (recommended)
+
+    go list ./cmd/... | tainted
+
 You can manually set the git commit ranges, by default the previous commit is checked with HEAD. i.e. `HEAD~1..HEAD`
 
 You can change any or all of the params
