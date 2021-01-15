@@ -6,6 +6,14 @@ Ideally used as part of a CI/CD pipeline to see which servies should be rebuilt 
 
 N.B. Name inspired by terraforms taint terminology
 
+# Project status
+
+I do not have time to update or maintain this package but fortunatly Digital ocean have a much better and activly maintained tool here which does what atinted does and more,
+
+https://github.com/digitalocean/gta
+
+https://www.digitalocean.com/blog/gta-detecting-affected-dependent-go-packages/
+
 # Requirments
 - git MUST be installed and be on the path where tainted is run
 
